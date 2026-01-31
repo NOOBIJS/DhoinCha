@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangla Academy Stock Management - Sequence Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .mermaid {
+            background-color: white;
+            padding: 20px;
+        }
+        /* Make alt/opt boundary boxes bold and visible */
+        .mermaid rect[class*="labelBox"] {
+            stroke-width: 3px !important;
+            stroke: #000 !important;
+        }
+        .mermaid g[class*="alt"] rect,
+        .mermaid g[class*="opt"] rect,
+        .mermaid g[class*="loop"] rect {
+            stroke-width: 3px !important;
+            stroke: #000 !important;
+        }
+        .mermaid .loopLine {
+            stroke-width: 3px !important;
+            stroke: #000 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bangla Academy - Book Stock Management System</h1>
+        <div class="mermaid">
+sequenceDiagram
+    participant Customer
+    participant FacebookPage
+    participant StockManagement
+    participant ProductionStock
+    participant PhysicalOutlet
+    participant BookFair
+    participant FinancialSystem
+    participant DiscountModule
+
+    Note over StockManagement,ProductionStock: Books kept in production stock
+
+    alt Order from Facebook
+        Customer->>FacebookPage: Place book order
+        activate FacebookPage
+        FacebookPage->>StockManagement: Process order request
+        activate StockManagement
+        StockManagement->>ProductionStock: Check availability
+        activate ProductionStock
+        ProductionStock-->>StockManagement: Confirm availability
+        deactivate ProductionStock
+        
+        StockManagement->>DiscountModule: Check applicable discount
+        activate DiscountModule
+        DiscountModule-->>StockManagement: Return discount details
+        deactivate DiscountModule
+        
+        StockManagement->>ProductionStock: Deduct from stock
+        activate ProductionStock
+        ProductionStock-->>StockManagement: Stock updated
+        deactivate ProductionStock
+        
+        StockManagement->>FinancialSystem: Record transaction
+        activate FinancialSystem
+        FinancialSystem-->>StockManagement: Transaction recorded
+        deactivate FinancialSystem
+        
+        StockManagement-->>FacebookPage: Confirm order and delivery
+        deactivate StockManagement
+        FacebookPage-->>Customer: Deliver books
+        deactivate FacebookPage
+    end
+
+    alt Physical outlet sale
+        Customer->>PhysicalOutlet: Visit and purchase books
+        activate PhysicalOutlet
+        PhysicalOutlet->>ProductionStock: Request books
+        activate ProductionStock
+        ProductionStock-->>PhysicalOutlet: Transfer books
+        deactivate ProductionStock
+        
+        PhysicalOutlet->>DiscountModule: Apply member discount
+        activate DiscountModule
+        DiscountModule-->>PhysicalOutlet: Discount applied
+        deactivate DiscountModule
+        
+        PhysicalOutlet->>FinancialSystem: Record sale
+        activate FinancialSystem
+        FinancialSystem-->>PhysicalOutlet: Sale recorded
+        deactivate FinancialSystem
+        
+        PhysicalOutlet-->>Customer: Complete sale
+        deactivate PhysicalOutlet
+    end
+
+    alt Book fair
+        BookFair->>StockManagement: Request books for fair
+        activate StockManagement
+        StockManagement->>ProductionStock: Transfer books to fair
+        activate ProductionStock
+        ProductionStock-->>StockManagement: Books transferred
+        deactivate ProductionStock
+        
+        StockManagement->>BookFair: Deliver books
+        deactivate StockManagement
+        activate BookFair
+        
+        loop During fair
+            Customer->>BookFair: Purchase books
+            BookFair->>DiscountModule: Apply fair discount
+            activate DiscountModule
+            DiscountModule-->>BookFair: Discount applied
+            deactivate DiscountModule
+            
+            BookFair->>FinancialSystem: Record sale
+            activate FinancialSystem
+            FinancialSystem-->>BookFair: Sale recorded
+            deactivate FinancialSystem
+            
+            BookFair-->>Customer: Complete purchase
+        end
+        
+        Note over BookFair: Fair ends
+        
+        BookFair->>StockManagement: Return unsold books
+        activate StockManagement
+        StockManagement->>ProductionStock: Add returned books to stock
+        activate ProductionStock
+        ProductionStock-->>StockManagement: Stock updated
+        deactivate ProductionStock
+        
+        StockManagement->>FinancialSystem: Reconcile fair transactions
+        activate FinancialSystem
+        FinancialSystem-->>StockManagement: Reconciliation complete
+        deactivate FinancialSystem
+        
+        StockManagement-->>BookFair: Confirm reconciliation
+        deactivate StockManagement
+        deactivate BookFair
+    end
+
+    Note over StockManagement,FinancialSystem: Real-time stock and financial tracking ensures transparency
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default'
+        });
+    </script>
+</body>
+</html>

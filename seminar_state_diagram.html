@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seminar State Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .mermaid {
+            background-color: white;
+            padding: 20px;
+        }
+        /* Make state boxes more visible */
+        .mermaid .statediagram-state rect {
+            stroke-width: 2px !important;
+            stroke: #000 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>University Seminar - State Diagram</h1>
+        <div class="mermaid">
+stateDiagram-v2
+    [*] --> Proposed: Professor proposes seminar
+
+    Proposed --> Scheduled: Dates, times and rooms arranged
+
+    Scheduled --> OpenForEnrollment: Second Monday in August / Seminar advertised
+
+    OpenForEnrollment --> Full: All places taken
+
+    Full --> OpenForEnrollment: Student cancels application
+
+    OpenForEnrollment --> EnrollmentClosed: Two days before seminar start
+
+    Full --> EnrollmentClosed: Two days before seminar start
+
+    EnrollmentClosed --> Running: Seminar starts
+
+    Running --> Completed: Seminar ends
+
+    Completed --> [*]
+
+    note right of Proposed
+        Initial state when professor
+        proposes a research topic
+    end note
+
+    note right of Scheduled
+        Dates, times, and rooms
+        have been arranged
+    end note
+
+    note right of OpenForEnrollment
+        Advertised on second Monday
+        in August, students can enroll
+    end note
+
+    note right of Full
+        All places taken,
+        no more enrollment allowed
+    end note
+
+    note right of EnrollmentClosed
+        Two days before start,
+        no more applicants considered
+    end note
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default'
+        });
+    </script>
+</body>
+</html>

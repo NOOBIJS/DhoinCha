@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheduler App - Sequence Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .mermaid {
+            background-color: white;
+            padding: 20px;
+        }
+        /* Make alt/opt boundary boxes bold and visible */
+        .mermaid rect[class*="labelBox"] {
+            stroke-width: 3px !important;
+            stroke: #000 !important;
+        }
+        .mermaid g[class*="alt"] rect,
+        .mermaid g[class*="opt"] rect {
+            stroke-width: 3px !important;
+            stroke: #000 !important;
+        }
+        .mermaid .loopLine {
+            stroke-width: 3px !important;
+            stroke: #000 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scheduler App - Sequence Diagram</h1>
+        <div class="mermaid">
+sequenceDiagram
+    participant User
+    participant UI
+    participant Calendar
+    participant AppointmentList
+    participant ReminderList
+
+    User->>UI: Choose to add new appointment
+    activate UI
+    UI->>Calendar: Identify active date/time
+    activate Calendar
+    Calendar-->>UI: Return active date/time
+    deactivate Calendar
+    UI-->>User: Pop up Add Appointment window
+    deactivate UI
+    
+    User->>UI: Enter appointment details
+    activate UI
+    
+    alt Invalid information
+        UI-->>User: Show error and prevent entry
+    else Valid information
+        UI->>Calendar: Check for existing appointment
+        activate Calendar
+        
+        alt Appointment exists at that time
+            Calendar-->>UI: Return conflict
+            UI-->>User: Show message to choose available time or replace
+        else No conflict
+            Calendar->>Calendar: Check for duplicate name and duration
+            
+            alt Duplicate exists
+                Calendar-->>UI: Ask if joining existing meeting
+                UI-->>User: Confirm join existing meeting?
+                
+                User->>UI: User response
+                
+                alt User chooses to join
+                    UI->>Calendar: Add user to participants
+                    Calendar->>AppointmentList: Update meeting participants
+                    activate AppointmentList
+                    AppointmentList-->>Calendar: Confirm update
+                    deactivate AppointmentList
+                    Calendar-->>UI: Done
+                    UI-->>User: Appointment confirmed
+                else User creates new
+                    UI->>Calendar: Record new appointment
+                    Calendar->>AppointmentList: Add to appointment list
+                    activate AppointmentList
+                    AppointmentList-->>Calendar: Confirm addition
+                    deactivate AppointmentList
+                    Calendar-->>UI: Done
+                    UI-->>User: Appointment created
+                end
+                
+            else Unique appointment
+                UI->>Calendar: Record new appointment
+                Calendar->>AppointmentList: Add to appointment list
+                activate AppointmentList
+                AppointmentList-->>Calendar: Confirm addition
+                deactivate AppointmentList
+                Calendar-->>UI: Done
+                
+                opt Reminder selected
+                    UI->>ReminderList: Add reminder
+                    activate ReminderList
+                    ReminderList-->>UI: Confirm reminder added
+                    deactivate ReminderList
+                end
+                
+                UI-->>User: Appointment created
+            end
+        end
+        deactivate Calendar
+    end
+    deactivate UI
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default'
+        });
+    </script>
+</body>
+</html>
